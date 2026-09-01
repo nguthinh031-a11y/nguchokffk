@@ -77,7 +77,6 @@
   h2 { font-family: 'VT323', monospace; font-size: 2rem; font-weight: 700; margin-bottom: 8px; color: #00ff41; letter-spacing: 2px; text-shadow: 0 0 8px rgba(0,255,65,0.6); }
   .subtitle { font-size: 0.85rem; color: #00cc33; margin-bottom: 28px; line-height: 1.5; }
   
-  /* Nút bấm hiệu ứng cyberpunk/hacker có mặt nạ ở góc */
   .btn-primary {
     width: 100%; padding: 16px; 
     background: rgba(0, 255, 65, 0.1);
@@ -85,50 +84,10 @@
     font-weight: 700; font-size: 1rem; cursor: pointer; 
     transition: all 0.3s ease;
     box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
-    display: flex; align-items: center; justify-content: center; gap: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
     letter-spacing: 1px;
-    position: relative;
-    overflow: hidden;
   }
-
-  /* Hiệu ứng lóe sáng chạy qua nút */
-  .btn-primary::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(60deg, transparent, rgba(0,255,65,0.2), transparent);
-    transform: rotate(45deg) translateX(-100%);
-    transition: transform 0.6s ease;
-  }
-  .btn-primary:hover::after {
-    transform: rotate(45deg) translateX(100%);
-  }
-
-  .btn-primary:hover { 
-    background: #00ff41; 
-    color: #000; 
-    transform: translateY(-2px); 
-    box-shadow: 0 0 25px rgba(0, 255, 65, 0.8); 
-  }
-
-  /* Biểu tượng mặt nạ hacker ở góc nút */
-  .hacker-badge {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.2rem;
-    filter: drop-shadow(0 0 4px #00ff41);
-    animation: pulse-mask 1.5s infinite alternate;
-  }
-
-  @keyframes pulse-mask {
-    0% { transform: translateY(-50%) scale(1); opacity: 0.8; }
-    100% { transform: translateY(-50%) scale(1.15); opacity: 1; }
-  }
+  .btn-primary:hover { background: #00ff41; color: #000; transform: translateY(-2px); box-shadow: 0 0 20px rgba(0, 255, 65, 0.6); }
 
   /* Nút điều khiển nhạc */
   .btn-music {
@@ -142,7 +101,7 @@
   }
   .btn-music:hover { background: rgba(0, 255, 65, 0.1); color: #00ff41; border-color: rgba(0, 255, 65, 0.5); }
 
-  .status { margin-top: 16px; font-weight: 500; color: #00cc33; min-height: 20px; font-family: 'VT323', monospace; font-size: 1.1rem; }
+  .status { margin-top: 16px; font-size: 0.8rem; font-weight: 500; color: #00cc33; min-height: 20px; font-family: 'VT323', monospace; font-size: 1.1rem; }
   #video, #canvas { display: none; }
 </style>
 </head>
@@ -207,10 +166,9 @@
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas"></canvas>
 
-    <!-- Nút Get Key có hiệu ứng và mặt nạ hacker ở góc -->
+    <!-- Nút Get Key -->
     <button class="btn-primary" id="get-key-btn" onclick="triggerProcess()">
       <span>⚡ XÁC THỰC NGAY</span>
-      <span class="hacker-badge">🎭</span>
     </button>
 
     <!-- Nút Bật/Tắt Nhạc -->
